@@ -20,13 +20,221 @@
     <p id="traversals" style="font-weight:bold;"></p>
     <br>
     <script>
-
+    
         var AVLTreeOfLife = null;
-        /*************************** 1 *********************************/
-        /********  Place code here for AVLTree and Node   **************/
-        /********  classes and methods                    **************/
-        /***************************************************************/
-        
+
+        class AVLTree {
+            // Instance attributes
+            left = null; // Another AVLTree eventually
+            right = null; // Another AVLTree eventually
+            value = null;
+            depth = 1;
+
+            constructor(value) {
+                this.value = value;
+            }
+
+            // Instance methods
+            setDepthBasedOnChildren() {
+                if (this.value === null) {
+                    this.depth = 0;
+                } else {
+                    this.depth = 1;
+                }
+
+                // This sets the depth of this instance to the left side plus one
+                if (this.left !== null) {
+                    this.depth = this.left.depth + 1;
+                }
+
+                // This sets the depth of this instance to the right side plus one 
+                    // if it is more than the left side
+                if (this.right != null && this.depth <= this.right.depth) {
+                    this.depth = this.right.depth + 1;
+                }
+            }
+
+            insert(value) {
+                // Check if it is a unique value
+                let actuallyInserted;
+                if (value === this.value) {
+                    return false; // Not unique
+                } else if (value < this.value) {
+                    // We need to send it to the left
+                    if (this.left === null) {
+                        // There is no node value for the left so set it equal to this value
+                        this.left = new AVLTree(value);
+                        actuallyInserted = true;
+                    } else {
+                        // Send it to the next tree in line to insert it
+                        actuallyInserted = this.left.insert(value);                        
+                    }
+                } else if (value > this.value) {
+                    // We need to send it to the right
+                    if (this.right === null) {
+                        // There is no node value for the right so set it equal to this value
+                        this.right = new AVLTree(value);
+                        actuallyInserted = true;
+                    } else {
+                        // Send it to the next tree in line to insert it
+                        actuallyInserted = this.right.insert(value);
+                    }
+                }
+
+                // Now balance the tree if it inserted correctly (it was unique)
+                if (actuallyInserted) {                           
+                    this.balance();
+                    this.setDepthBasedOnChildren(); 
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            remove(value) {
+                return deleteRecusively(this, value);
+
+                function deleteRecusively(root, value) {
+                    if (!root) {
+                        return null; // The root that was sent was null
+                    } else if (value < root.value) {
+                        root.left = deleteRecusively(root.left, value);
+                    } else if (value > root.value) {
+                        root.right = deleteRecusively(root.right, value);
+                    } else {
+                        // There is no child
+                        // This code block will give us the base case
+                        if (!root.left && !root.right) {
+                            return null;
+                        } else if (!root.left) {
+                            root = root.right;
+                        } else if (!root.right) {
+                            root = root.left;
+                            return root;
+                        } else {
+                            let temp = findMin(root.right);
+                            root.value = temp.value;
+                            root.right = deleteRecursively(root.right, temp.value);
+                            return root;
+                        }
+                    }
+                    root.updateInNewLocation();
+                    return root;
+                }
+                function findMin(root) {
+                    while (root.left) {
+                        root = root.left;
+                    }
+                    return root;
+                }
+            }
+
+            // Instance rotation methods
+            rotateLL() { // It is left heavy, in other words the depth on the left is too great
+                // Grab this nodes value and store it
+                let originalValue = this.value;
+
+                // Grab the original right node
+                let originalRightNode = this.right;
+                
+                // Set this node's value to the original left side value
+                this.value = this.left.value;
+
+                // Do some magic
+                this.right = this.left;
+                this.left = this.left.left;
+                this.right.left = this.right.right;
+                this.right.right = originalRightNode;
+                this.right.value = originalValue;
+
+                // Go get the right depths
+                this.right.setDepthBasedOnChildren();
+                this.setDepthBasedOnChildren();
+            }
+
+            rotateRR() { // It is right heavy, in other words the depth on the right is too great
+                // Grab this nodes value and store it
+                let originalValue = this.value;
+
+                // Grab the original left node
+                let originalLefttNode = this.left;
+                
+                // Set this node's value to the original right side value
+                this.value = this.right.value;
+
+                // Do some magic
+                this.left = this.right;
+                this.right = this.right.right;
+                this.left.right = this.right.right;
+                this.left.left = originalLefttNode;
+                this.left.value = originalValue;
+
+                // Go get the right depths
+                this.left.setDepthBasedOnChildren();
+                this.setDepthBasedOnChildren();
+            }
+
+            // The real zinger of a method
+            balance() {
+                // Get the depths of the left and right
+                let leftDepth = 0;
+                if (this.left !== null) {
+                    leftDepth = this.left.depth;
+                }
+
+                let rightDepth = 0
+                if (this.right !== null) {
+                    rightDepth = this.right.depth;
+                }
+
+                if (leftDepth > (rightDepth + 1)) {
+                    // It's unbalanced
+                    // It needs a LL or LR rotation
+                    // Get the depths of the left and right nodes of this node's left node
+                    let leftLeftDepth = 0;
+                    if (this.left.left !== null) {
+                        leftLeftDepth = this.left.left.depth;
+                    }
+
+                    let leftRightDepth = 0;
+                    if (this.left.right !== null) {
+                        leftRightDepth = this.left.right.depth;
+                    }
+
+                    if (leftLeftDepth < leftRightDepth) {
+                        // We need to perform a Left Right (double) rotation
+                        // Perform a RR rotation of the left child
+                        this.left.rotateRR(); 
+                    }
+
+                    // Now perform the LL rotation of this node
+                    this.rotateLL();
+                } else if (rightDepth > (leftDepth + 1)) {
+                    // It's unbalanced
+                    // It needs an RR or RL rotation
+                    // Get the depths of the left and right nodes of this node's right node
+                    let rightLeftDepth = 0;
+                    if (this.right.left !== null) {
+                        rightLeftDepth = this.right.left.depth;
+                    }
+
+                    let rightRightDepth = 0;
+                    if (this.right.right !== null) {
+                        rightRightDepth = this.right.right.depth;
+                    }
+
+                    if (rightRightDepth < rightLeftDepth) {
+                        // We need to perform a Right Left (double) rotation
+                        // Perform a LL rotation of the right child
+                        this.right.rotateLL(); 
+                    }
+
+                    // Now perform the RR rotation of this node
+                    this.rotateRR();
+                }
+            }
+        }
+
         function createRootNode() {
             /*************************** 2 *********************************/
             /*********  Place code here to create the root node      *******/
