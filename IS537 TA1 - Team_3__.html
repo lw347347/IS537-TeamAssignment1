@@ -27,11 +27,13 @@
             // Instance attributes
             left = null; // Another AVLTree eventually
             right = null; // Another AVLTree eventually
-            value = null;
+            value = null; // We will use this as the key or in other words this is the word
+            wordCount = null;
             depth = 1;
 
-            constructor(value) {
+            constructor(value, wordCount) {
                 this.value = value;
+                this.wordCount = wordCount;
             }
 
             // Instance methods
@@ -54,7 +56,7 @@
                 }
             }
 
-            insert(value) {
+            insert(value, wordCount) {
                 // Check if it is a unique value
                 let actuallyInserted;
                 if (value === this.value) {
@@ -63,7 +65,7 @@
                     // We need to send it to the left
                     if (this.left === null) {
                         // There is no node value for the left so set it equal to this value
-                        this.left = new AVLTree(value);
+                        this.left = new AVLTree(value, wordCount);
                         actuallyInserted = true;
                     } else {
                         // Send it to the next tree in line to insert it
@@ -73,7 +75,7 @@
                     // We need to send it to the right
                     if (this.right === null) {
                         // There is no node value for the right so set it equal to this value
-                        this.right = new AVLTree(value);
+                        this.right = new AVLTree(value, wordCount);
                         actuallyInserted = true;
                     } else {
                         // Send it to the next tree in line to insert it
@@ -235,10 +237,10 @@
             }
         }
 
-        function createRootNode() {
-            /*************************** 2 *********************************/
-            /*********  Place code here to create the root node      *******/
-            /***************************************************************/
+        function createRootNode(word, count) {
+            let rootNode = new AVLTree(word);
+            rootNode.wordCount = count;
+            return rootNode;
         }
         
         /******* Main functional Steps ******/
