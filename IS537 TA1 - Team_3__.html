@@ -281,17 +281,44 @@
 
             unfilteredArray = allText.split(' ')
 
-            wordsArray = unfilteredArray.filter((word) => { return word })
+            wordArray = unfilteredArray.filter((word) => { return word })
 
             return wordArray;
         }
 
         /**** Counts unique occurrences of each word ****/
         function countUniqueWords(array) {
-            var wordCountArray = [];
+            let wordCountArray = [];
             /*************************** 4 ************************************/
             /*********  Place code here to count unique words  ****************/
             /******************************************************************/
+            /* Nate Schillen - 4/2/21 */
+
+            let wordBank = new Set();
+                let wordCount = [];
+                //first I gather all of the words in a set, then I push an onject with each word and a 0 in the 1 position
+                for(let i = 0; i < array.length; i++){
+                    let word = array[i];
+                    if(!wordBank.has(word)){
+                        wordBank.add(word);
+                        wordCount.push([word,0])
+                    }
+
+                    //then, I go back through the full array and count how many instances of each word there are
+                    for(let j = 0; j < wordCount.length; j++){
+                        if(wordCount[j][0] === word){
+                            wordCount[j][1] += 1
+                        }
+                    }
+
+                }
+
+                //boom! my word count is an array of objects with each word and the number of occurances
+                wordCountArray = wordCount;
+
+                console.log(wordCountArray)
+
+
             return wordCountArray;
         }
 
