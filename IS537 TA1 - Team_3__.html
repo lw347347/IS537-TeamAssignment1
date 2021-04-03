@@ -18,9 +18,9 @@
     <p id="treeInfo" style="font-weight:bold;"></p><br>
     <label for="chapterWord">Lookup Count for Word: </label>
     <input type="text" id="chapterWord" style="width: 10em;" value="tree"
-        onkeydown="if(event.keyCode == 13) getWordCount(document.getElementById(&#39;chapterWord&#39;).value);"><br>
-    <input type="button" value="Display this word&#39;s count"
-        onclick="getWordCount(document.getElementById(&#39;chapterWord&#39;).value)">
+        onkeydown="if(event.keyCode == 13) getWordCount(document.getElementById('chapterWord').value);"><br>
+    <input type="button" value="Display this word's count"
+        onclick="getWordCount(document.getElementById('chapterWord').value)">
     <br>
     <p id="wordCount" style="font-weight:bold;"></p>
     <p id="traversals" style="font-weight:bold;"></p>
@@ -40,6 +40,10 @@
             constructor(value, wordCount) {
                 this.value = value;
                 this.wordCount = wordCount;
+            }
+
+            getDepth(){
+                return this.depth;
             }
 
             // Instance methods
@@ -173,7 +177,7 @@
                 // Do some magic
                 this.left = this.right;
                 this.right = this.right.right;
-                this.left.right = this.right.right;
+                this.left.right = this.left.left;
                 this.left.left = originalLefttNode;
                 this.left.value = originalValue;
 
@@ -253,11 +257,16 @@
         function avlTreeProcess() {
             var chapterWords = parseChapterWords();                         /*** function code needed ***/
             var countedWords = countUniqueWords(chapterWords);              /*** function code needed ***/
-            var avlTreeRoot = createRootNode();                             /*** function code needed ***/
+            var avlTreeRoot = createRootNode(countedWords[0][0], countedWords[0][1]);                             /*** function code needed ***/
             var avlTreeOfLife = buildAVLTree(avlTreeRoot, countedWords);    /*** function code needed ***/
             var messageArea = countedWords + " AVL Tree Nodes: <br>" +
                 "AVL Tree Depth: " + getTreeDepth(avlTreeOfLife);
+            AVLTreeOfLife = avlTreeOfLife
 
+        }
+
+        function getTreeDepth(avlTree){
+            return avlTree.getDepth();
         }
 
         /**** Parse words out of both 1 Nephi 8 and 1 Nephi 11 ****/
@@ -316,18 +325,21 @@
                 //boom! my word count is an array of objects with each word and the number of occurances
                 wordCountArray = wordCount;
 
-                console.log(wordCountArray)
+                // console.log(wordCountArray)
 
 
             return wordCountArray;
         }
 
         /******    Function to build AVL Tree ******/
-        function buildAVLTree(wordCountArray) {
-            var nodeCount = 0;
-            /**************************** 5 **********************************/
-            /*********  Place code here to build (fill) the AVL Tree  *******/
-            /******************************************************************/
+        function buildAVLTree(avlTree, wordCountArray) {
+            /* Statler Smith 4/3/2021 */
+            var nodeCount = 1;
+            for(let i = 1; i < wordCountArray.length; i++){
+                avlTree.insert(wordCountArray[i][0], wordCountArray[i][1])
+                nodeCount++;
+            }
+            // console.log(avlTree)
             document.getElementById('treeInfo').innerHTML = "AVL Tree created with " + nodeCount + " nodes";
             return avlTree;
         }
