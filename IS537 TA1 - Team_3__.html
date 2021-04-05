@@ -368,7 +368,6 @@
             /******************************************************************/
             /* Matthew Gardner; 4/3/21 */
             do {
-                traversals++;
                 if (word === treeObject.value) {
                     wordCount = treeObject.wordCount;
                     // if we find the right node, we exit the do loop here
@@ -378,6 +377,7 @@
                 } else if (word > treeObject.value) {
                     treeObject = treeObject.right;
                 }
+                traversals++;
             }
             // if we get to the end of the tree, then exit the do loop
             while (treeObject != null && treeObject != undefined) {
