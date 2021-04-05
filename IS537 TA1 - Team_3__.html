@@ -6,7 +6,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IS537 TA1 - Team &lt;!--Team Number Here--&gt;&gt;</title>
+    <title>IS537 TA1 - Team &lt;2&gt;&gt;</title>
+    <!-- 
+        Authors: 
+            Nathan Bidstrup, Matthew Gardner, Nate Schillen, Statler Smith, and Landon Williams
+
+        Description:
+            Parse words, count unique words, place words into AVL tree
+     -->
 </head>
 
 <body>
@@ -79,7 +86,7 @@
                         actuallyInserted = true;
                     } else {
                         // Send it to the next tree in line to insert it
-                        actuallyInserted = this.left.insert(value);
+                        actuallyInserted = this.left.insert(value, wordCount);
                     }
                 } else if (value > this.value) {
                     // We need to send it to the right
@@ -89,7 +96,7 @@
                         actuallyInserted = true;
                     } else {
                         // Send it to the next tree in line to insert it
-                        actuallyInserted = this.right.insert(value);
+                        actuallyInserted = this.right.insert(value, wordCount);
                     }
                 }
 
@@ -145,12 +152,14 @@
             rotateLL() { // It is left heavy, in other words the depth on the left is too great
                 // Grab this nodes value and store it
                 let originalValue = this.value;
+                let originalWordCount = this.wordCount;
 
                 // Grab the original right node
                 let originalRightNode = this.right;
 
                 // Set this node's value to the original left side value
                 this.value = this.left.value;
+                this.wordCount = this.left.wordCount;
 
                 // Do some magic
                 this.right = this.left;
@@ -158,6 +167,7 @@
                 this.right.left = this.right.right;
                 this.right.right = originalRightNode;
                 this.right.value = originalValue;
+                this.right.wordCount = originalWordCount;
 
                 // Go get the right depths
                 this.right.setDepthBasedOnChildren();
@@ -167,12 +177,14 @@
             rotateRR() { // It is right heavy, in other words the depth on the right is too great
                 // Grab this nodes value and store it
                 let originalValue = this.value;
+                let originalWordCount = this.wordCount;
 
                 // Grab the original left node
                 let originalLefttNode = this.left;
 
                 // Set this node's value to the original right side value
                 this.value = this.right.value;
+                this.wordCount = this.right.wordCount;
 
                 // Do some magic
                 this.left = this.right;
@@ -180,6 +192,7 @@
                 this.left.right = this.left.left;
                 this.left.left = originalLefttNode;
                 this.left.value = originalValue;
+                this.left.wordCount = originalWordCount;
 
                 // Go get the right depths
                 this.left.setDepthBasedOnChildren();
@@ -246,6 +259,13 @@
                 }
             }
         }
+
+        let avltree = new AVLTree('hello', 30);
+        avltree.insert('hello1', 20);
+        avltree.insert('hello2', 21);
+        avltree.insert('hello3', 23);
+        avltree.insert('hello4', 24);
+        avltree.insert('hello5', 25);
 
         function createRootNode(word, count) {
             let rootNode = new AVLTree(word);
@@ -345,16 +365,33 @@
         }
 
         function getWordCount(word) {
-            var wordCount = 0;
-            var traversals = 0;
+            let wordCount = 0;
+            let traversals = 0;
+            let treeObject = AVLTreeOfLife;
             /*************************** 6 ************************************/
             /****  Place code here to search for the word in the tree   *******/
             /**************  and get the count for display  *******************/
             /********* also display the number of traversals required *********/
             /******************************************************************/
-            document.getElementById('wordCount').innerHTML = "'" + word + "' is used " + wordCount + " times.";
-            document.getElementById('traversals').innerHTML = "The search required " +
-                traversals + " traversals";
+            /* Matthew Gardner; 4/3/21 */
+            do {
+                if (word === treeObject.value) {
+                    wordCount = treeObject.wordCount;
+                    // if we find the right node, we exit the do loop here
+                    break;
+                } else if (word < treeObject.value) {
+                    treeObject = treeObject.left;
+                } else if (word > treeObject.value) {
+                    treeObject = treeObject.right;
+                }
+                traversals++;
+            }
+            // if we get to the end of the tree, then exit the do loop
+            while (treeObject != null && treeObject != undefined) {
+                document.getElementById('wordCount').innerHTML = "'" + word + "' is used " + wordCount + " times.";
+                document.getElementById('traversals').innerHTML = "The search required " +
+                    traversals + " traversals";
+            }
         }
 
     </script>
